@@ -1,0 +1,90 @@
+import streamlit as st
+
+st.set_page_config(page_title="Selector de prueba estadística", page_icon="📊")
+
+st.title("📊 Selector de prueba estadística")
+st.write("Responde a las preguntas y elige qué prueba estadística aplicar según tu estudio.")
+
+# ---- Pregunta 1: Tipo de variable ----
+st.subheader("1) ¿El dato principal es numérico o categórico?")
+tipo_variable = st.radio("", ["Numérico (puntajes, medidas, cantidades)", 
+                              "Categórico (sí/no, grupos, tipos)"])
+
+# ---- Si la variable es categórica ----
+if tipo_variable == "Categórico (sí/no, grupos, tipos)":
+    st.subheader("2) ¿Deseas analizar relación entre categorías?")
+    cat = st.radio("", ["Sí", "No"])
+
+    if cat == "Sí":
+        st.success("👉 La prueba recomendada es: **Chi-Cuadrada (χ²)**")
+    else:
+        st.info("⚠ No se puede usar pruebas de medias. Se trabaja con proporciones o gráficos descriptivos.")
+    st.stop()
+
+# ---- Si la variable es numérica ----
+st.subheader("2) ¿Cuántos grupos deseas comparar?")
+grupos = st.radio("", ["1 grupo", "2 grupos", "3 o más grupos"])
+
+# ----- Una variable numérica en 1 grupo ----
+if grupos == "1 grupo":
+    st.subheader("3) ¿Deseas evaluar relación con otra variable?")
+    relacion = st.radio("", ["Sí", "No"])
+
+    if relacion == "No":
+        st.info("👉 No se compara con otra variable, solo **estadísticos descriptivos**.")
+    else:
+        st.subheader("4) ¿La relación es lineal (tiene forma recta)?")
+        linear = st.radio("", ["Sí", "No/No estoy seguro"])
+
+        if linear == "Sí":
+            st.success("👉 Prueba recomendada: **Correlación de Pearson**")
+        else:
+            st.success("👉 Prueba recomendada: **Correlación de Spearman**")
+    st.stop()
+
+# ----- Para 2 grupos numéricos -----
+if grupos == "2 grupos":
+    st.subheader("3) ¿Los datos provienen de las mismas personas (antes-después) o de grupos distintos?")
+    dependencia = st.radio("", ["Mismas personas (pareados)", "Grupos distintos (independientes)"])
+
+    st.subheader("4) ¿Los datos tienen distribución normal?")
+    normal2 = st.radio("", ["Sí", "No/No estoy seguro"])
+
+    if dependencia == "Grupos distintos (independientes)":
+        if normal2 == "Sí":
+            st.success("👉 Prueba recomendada: **t de Student para muestras independientes**")
+        else:
+            st.success("👉 Prueba recomendada: **U de Mann–Whitney**")
+    else:
+        if normal2 == "Sí":
+            st.success("👉 Prueba recomendada: **t de Student para muestras relacionadas (pareadas)**")
+        else:
+            st.success("👉 Prueba recomendada: **Wilcoxon**")
+
+    st.stop()
+
+# ----- Para 3 o más grupos numéricos -----
+if grupos == "3 o más grupos":
+    st.subheader("3) ¿Los grupos son independientes?")
+    indep = st.radio("", ["Sí, son distintos", "No, son repetidos (mismas personas)"])
+
+    if indep == "No, son repetidos (mismas personas)":
+        st.info("⚠ Para más de dos mediciones repetidas se utiliza **ANOVA de medidas repetidas** (no incluido en este dashboard).")
+        st.stop()
+
+    st.subheader("4) ¿Los datos tienen distribución normal?")
+    normal3 = st.radio("", ["Sí", "No/No estoy seguro"])
+
+    if normal3 == "Sí":
+        st.success("👉 Prueba recomendada: **ANOVA de un factor**")
+    else:
+        st.success("👉 Prueba recomendada: **Kruskal–Wallis**")
+
+    st.stop()
+
+# ---- Relación numérica (correlación o regresión) ----
+st.subheader("¿Quieres predecir una variable?")
+pred = st.radio("", ["Sí, quiero predecir", "No"])
+
+if pred == "Sí":
+    st.success("👉 Prueba recomendada: **Regresión lineal simple**")
